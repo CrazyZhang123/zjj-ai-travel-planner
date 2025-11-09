@@ -27,9 +27,22 @@ export default function AuthBar() {
     }
     try {
       // 获取当前页面的 origin（自动适配本地和生产环境）
-      const redirectTo = typeof window !== 'undefined' 
-        ? `${window.location.origin}/auth/callback`
-        : 'http://localhost:3000/auth/callback';
+      // 优先使用环境变量配置的 URL，避免在 Docker 中使用 0.0.0.0
+      let baseUrl: string;
+      if (process.env.NEXT_PUBLIC_APP_URL) {
+        baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+      } else if (typeof window !== 'undefined') {
+        baseUrl = window.location.origin;
+        // 如果检测到 0.0.0.0，替换为 localhost（Docker 环境常见问题）
+        if (baseUrl.includes('0.0.0.0')) {
+          console.warn('检测到 0.0.0.0，自动替换为 localhost');
+          baseUrl = baseUrl.replace(/0\.0\.0\.0/g, 'localhost');
+        }
+      } else {
+        baseUrl = 'http://localhost:3000';
+      }
+      const redirectTo = `${baseUrl}/auth/callback`;
+      console.log('使用回调 URL:', redirectTo);
       
       const { error } = await supabase.auth.signInWithOtp({ 
         email,
