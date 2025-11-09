@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   ai-travel-planner:
-    image: registry.cn-hangzhou.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
+    image: crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
     container_name: ai-travel-planner
     ports:
       - "3000:3000"

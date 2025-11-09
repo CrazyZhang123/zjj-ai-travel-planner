@@ -24,10 +24,10 @@
 
 ```bash
 # 从阿里云容器镜像服务拉取
-docker pull registry.cn-hangzhou.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
+docker pull crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
 
 # 或者使用其他标签
-docker pull registry.cn-hangzhou.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:main
+docker pull crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:main
 ```
 
 #### 2. 运行容器
@@ -40,7 +40,7 @@ docker run -d \
   -e NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co \
   -e NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key \
   -e NEXT_PUBLIC_AMAP_KEY=your-amap-key \
-  registry.cn-hangzhou.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
+  crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
 ```
 
 #### 3. 使用环境变量文件
@@ -63,7 +63,7 @@ docker run -d \
   --name ai-travel-planner \
   -p 3000:3000 \
   --env-file docker.env \
-  registry.cn-hangzhou.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
+  crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
 ```
 
 #### 4. 访问应用
@@ -235,7 +235,7 @@ docker run -d \
 ### 镜像地址
 
 ```
-registry.cn-hangzhou.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
+crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
 ```
 
 ### 可用标签

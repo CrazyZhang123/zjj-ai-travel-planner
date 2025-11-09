@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 env:
-  REGISTRY: registry.cn-hangzhou.aliyuncs.com
+  REGISTRY: crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com
   # 请替换为你的阿里云容器镜像服务命名空间
   NAMESPACE: zjj-ai-travel-planner
   IMAGE_NAME: ai-travel-planner
