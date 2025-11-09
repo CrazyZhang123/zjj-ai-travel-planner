@@ -26,14 +26,26 @@ export default function AuthBar() {
       return;
     }
     try {
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      // 获取当前页面的 origin（自动适配本地和生产环境）
+      const redirectTo = typeof window !== 'undefined' 
+        ? `${window.location.origin}/auth/callback`
+        : 'http://localhost:3000/auth/callback';
+      
+      const { error } = await supabase.auth.signInWithOtp({ 
+        email,
+        options: {
+          emailRedirectTo: redirectTo
+        }
+      });
       if(error) {
         alert('登录失败：' + error.message);
+        console.error('Supabase login error:', error);
       } else {
         alert('✅ 登录邮件已发送，请查收邮箱并点击链接完成登录。');
       }
     } catch (error: any) {
       alert('登录时发生错误：' + error.message);
+      console.error('Login error:', error);
     }
   }
   
