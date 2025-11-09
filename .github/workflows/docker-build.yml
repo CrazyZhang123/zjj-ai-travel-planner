@@ -40,6 +40,19 @@ jobs:
           username: ${{ secrets.ALIYUN_ACR_USERNAME }}
           password: ${{ secrets.ALIYUN_ACR_PASSWORD }}
 
+      # 添加：创建 .env.local 文件（只包含 NEXT_PUBLIC_* 变量）
+      - name: Create .env.local file for build
+        run: |
+          echo "Creating .env.local file for build..."
+          cat > .env.local << EOF
+          NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_AMAP_KEY=${{ secrets.NEXT_PUBLIC_AMAP_KEY }}
+          EOF
+          echo ".env.local file created successfully"
+          # 验证文件内容（不显示敏感信息）
+          echo "File created with $(wc -l < .env.local) lines"
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
