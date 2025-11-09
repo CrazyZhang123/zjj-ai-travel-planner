@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   ai-travel-planner:
-    image: crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
+    # 请将 YOUR_NAMESPACE 替换为你的阿里云命名空间
+    image: registry.cn-hangzhou.aliyuncs.com/YOUR_NAMESPACE/ai-travel-planner:latest
     container_name: ai-travel-planner
     ports:
       - "3000:3000"

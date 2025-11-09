@@ -15,49 +15,33 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 
-# 接收构建参数（环境变量）
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG NEXT_PUBLIC_AMAP_KEY
-
-# 将 ARG 转换为 ENV，确保在构建时可用
-ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-ENV NEXT_PUBLIC_AMAP_KEY=${NEXT_PUBLIC_AMAP_KEY}
-
 # 复制依赖
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# 验证环境变量并创建 .env.local 文件
+# 验证 .env.local 文件是否存在并验证环境变量
 # Next.js 会自动读取 .env.local 文件中的 NEXT_PUBLIC_* 变量
 RUN echo "验证环境变量..." && \
-    if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ]; then \
+    if [ ! -f ".env.local" ]; then \
+      echo "❌ 错误: .env.local 文件不存在" && exit 1; \
+    fi && \
+    if ! grep -q "NEXT_PUBLIC_SUPABASE_URL=" .env.local 2>/dev/null || [ -z "$(grep '^NEXT_PUBLIC_SUPABASE_URL=' .env.local | cut -d'=' -f2)" ]; then \
       echo "❌ 错误: NEXT_PUBLIC_SUPABASE_URL 未设置或为空" && exit 1; \
     else \
-      echo "✅ NEXT_PUBLIC_SUPABASE_URL 已设置 (长度: $(echo -n "$NEXT_PUBLIC_SUPABASE_URL" | wc -c))"; \
+      echo "✅ NEXT_PUBLIC_SUPABASE_URL 已设置"; \
     fi && \
-    if [ -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]; then \
+    if ! grep -q "NEXT_PUBLIC_SUPABASE_ANON_KEY=" .env.local 2>/dev/null || [ -z "$(grep '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' .env.local | cut -d'=' -f2)" ]; then \
       echo "❌ 错误: NEXT_PUBLIC_SUPABASE_ANON_KEY 未设置或为空" && exit 1; \
     else \
-      echo "✅ NEXT_PUBLIC_SUPABASE_ANON_KEY 已设置 (长度: $(echo -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" | wc -c))"; \
+      echo "✅ NEXT_PUBLIC_SUPABASE_ANON_KEY 已设置"; \
     fi && \
-    if [ -z "$NEXT_PUBLIC_AMAP_KEY" ]; then \
+    if ! grep -q "NEXT_PUBLIC_AMAP_KEY=" .env.local 2>/dev/null || [ -z "$(grep '^NEXT_PUBLIC_AMAP_KEY=' .env.local | cut -d'=' -f2)" ]; then \
       echo "❌ 错误: NEXT_PUBLIC_AMAP_KEY 未设置或为空" && exit 1; \
     else \
-      echo "✅ NEXT_PUBLIC_AMAP_KEY 已设置 (长度: $(echo -n "$NEXT_PUBLIC_AMAP_KEY" | wc -c))"; \
+      echo "✅ NEXT_PUBLIC_AMAP_KEY 已设置"; \
     fi && \
     echo "环境变量验证通过" && \
-    printf "NEXT_PUBLIC_SUPABASE_URL=%s\n" "$NEXT_PUBLIC_SUPABASE_URL" > .env.local && \
-    printf "NEXT_PUBLIC_SUPABASE_ANON_KEY=%s\n" "$NEXT_PUBLIC_SUPABASE_ANON_KEY" >> .env.local && \
-    printf "NEXT_PUBLIC_AMAP_KEY=%s\n" "$NEXT_PUBLIC_AMAP_KEY" >> .env.local && \
-    echo ".env.local 文件已创建，包含 $(wc -l < .env.local) 行" && \
-    echo "验证 .env.local 文件内容（仅显示键名和值长度）:" && \
-    while IFS='=' read -r key value; do \
-      if [ -n "$key" ] && [ -n "$value" ]; then \
-        echo "  $key = [值长度: $(echo -n "$value" | wc -c)]"; \
-      fi; \
-    done < .env.local
+    echo ".env.local 文件包含 $(wc -l < .env.local) 行"
 
 # 构建应用
 # Next.js 会自动读取 .env.local 文件中的 NEXT_PUBLIC_* 变量
@@ -81,18 +65,11 @@ RUN echo "验证构建输出中的环境变量..." && \
 FROM base AS runner
 WORKDIR /app
 
-# 接收构建参数（环境变量）- 用于运行时
-ARG NEXT_PUBLIC_SUPABASE_URL
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG NEXT_PUBLIC_AMAP_KEY
-
-# 将 ARG 转换为 ENV，确保在运行时可用（服务端代码需要）
-ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-ENV NEXT_PUBLIC_AMAP_KEY=${NEXT_PUBLIC_AMAP_KEY}
-
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# 注意：NEXT_PUBLIC_* 变量已在构建时嵌入到客户端代码中
+# 服务端代码如果需要这些变量，应在运行时通过环境变量或 .env.local 文件提供
 
 # 创建非 root 用户
 RUN addgroup --system --gid 1001 nodejs

@@ -1,4 +1,4 @@
-name: Build and Push Docker Image to ACR
+name: Build and Push Docker Image
 
 on:
   push:
@@ -11,69 +11,66 @@ on:
     branches:
       - main
       - master
-  workflow_dispatch:
 
 env:
-  REGION: cn-hangzhou
-  REGISTRY: crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com
-  NAMESPACE: zjj-ai-travel-planner
-  IMAGE_NAME: ai-travel-planner
+  REGISTRY: registry.cn-hangzhou.aliyuncs.com
+  IMAGE_NAME: ${{ secrets.ALIYUN_NAMESPACE }}/ai-travel-planner
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ 拉取代码
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ 启用 Buildx 构建
+      - name: Create .env.local file
+        run: |
+          echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" >> .env.local
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env.local
+          echo "NEXT_PUBLIC_AMAP_KEY=${{ secrets.NEXT_PUBLIC_AMAP_KEY }}" >> .env.local
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 3️⃣ 登录到阿里云 ACR
-      - name: Log in to Alibaba Cloud Container Registry (ACR)
+      - name: Log in to Aliyun Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.ALIYUN_ACR_USERNAME }}
-          password: ${{ secrets.ALIYUN_ACR_PASSWORD }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          password: ${{ secrets.ALIYUN_PASSWORD }}
 
-      # 4️⃣ 自动生成镜像标签（tag）
-      - name: Extract Docker metadata
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
-            type=sha,format=short
+            type=ref,event=pr
             type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      # 5️⃣ 构建并推送镜像
-      - name: Build and push Docker image to ACR
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-            NEXT_PUBLIC_AMAP_KEY=${{ secrets.NEXT_PUBLIC_AMAP_KEY }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          platforms: linux/amd64
 
-      # 6️⃣ 输出镜像信息
       - name: Output image info
+        if: github.event_name != 'pull_request'
         run: |
           echo "✅ Docker image pushed successfully!"
           echo "Registry: ${{ env.REGISTRY }}"
-          echo "Image: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}"
+          echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
           echo "Tags: ${{ steps.meta.outputs.tags }}"
           echo ""
           echo "👉 你可以通过以下命令在本地拉取镜像："
-          echo "docker pull ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:latest"
+          echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
