@@ -15,14 +15,21 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 
+# 接收构建参数（环境变量）
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_AMAP_KEY
+
 # 复制依赖
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# 复制构建时环境变量文件（如果存在）
-# 注意：这个文件应该在构建时由构建脚本创建
-# 使用通配符使其可选，如果不存在也不会报错
-COPY .env.local* ./
+# 创建 .env.local 文件（从构建参数）
+# Next.js 会自动读取 .env.local 文件中的 NEXT_PUBLIC_* 变量
+RUN echo "NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}" > .env.local && \
+    echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}" >> .env.local && \
+    echo "NEXT_PUBLIC_AMAP_KEY=${NEXT_PUBLIC_AMAP_KEY}" >> .env.local && \
+    echo ".env.local file created with $(wc -l < .env.local) lines"
 
 # 构建应用
 # Next.js 会自动读取 .env.local 文件中的 NEXT_PUBLIC_* 变量

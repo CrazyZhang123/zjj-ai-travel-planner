@@ -40,19 +40,6 @@ jobs:
           username: ${{ secrets.ALIYUN_ACR_USERNAME }}
           password: ${{ secrets.ALIYUN_ACR_PASSWORD }}
 
-      # 添加：创建 .env.local 文件（只包含 NEXT_PUBLIC_* 变量）
-      - name: Create .env.local file for build
-        run: |
-          echo "Creating .env.local file for build..."
-          cat > .env.local << EOF
-          NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_AMAP_KEY=${{ secrets.NEXT_PUBLIC_AMAP_KEY }}
-          EOF
-          echo ".env.local file created successfully"
-          # 验证文件内容（不显示敏感信息）
-          echo "File created with $(wc -l < .env.local) lines"
-
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -73,9 +60,14 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # 注释掉或删除以下两行，因为 ACR 不支持 BuildKit registry 缓存
-          # cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:buildcache
-          # cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+          # 使用 build-args 传递环境变量到 Docker 构建
+          build-args: |
+            NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+            NEXT_PUBLIC_AMAP_KEY=${{ secrets.NEXT_PUBLIC_AMAP_KEY }}
+          # 使用 GitHub Actions cache 替代 registry 缓存（ACR 不支持 BuildKit registry 缓存）
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Output image info
         run: |
