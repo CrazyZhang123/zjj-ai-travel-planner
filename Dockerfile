@@ -19,9 +19,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# 复制构建时环境变量文件（只包含 NEXT_PUBLIC_* 变量）
+# 复制构建时环境变量文件（如果存在）
 # 注意：这个文件应该在构建时由构建脚本创建
-COPY .env.local .env.local
+# 使用通配符使其可选，如果不存在也不会报错
+COPY .env.local* ./
 
 # 构建应用
 # Next.js 会自动读取 .env.local 文件中的 NEXT_PUBLIC_* 变量
