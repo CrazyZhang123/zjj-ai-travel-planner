@@ -68,6 +68,8 @@ jobs:
           # 使用 GitHub Actions cache 替代 registry 缓存（ACR 不支持 BuildKit registry 缓存）
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # 启用详细日志以调试构建问题
+          no-cache: false
 
       - name: Output image info
         run: |
