@@ -30,13 +30,7 @@ docker pull crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-tr
 docker pull crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:main
 ```
 
-#### 2. 运行容器
-
-```bash
-docker run -d   --name 1805ai-travel-planner   -p 3001:3000   crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
-```
-
-#### 3. 使用环境变量文件
+#### 2. 使用环境变量文件
 
 创建 `docker.env` 文件：
 
@@ -69,17 +63,17 @@ docker run -d \
   crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
 ```
 
-#### 4. 访问应用
+#### 3. 访问应用
 
 打开浏览器访问：http://localhost:3000
 
-#### 5. 查看日志
+#### 4. 查看日志
 
 ```bash
 docker logs -f ai-travel-planner
 ```
 
-#### 6. 停止和删除容器
+#### 5. 停止和删除容器
 
 ```bash
 # 停止容器
