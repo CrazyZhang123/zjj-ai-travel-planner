@@ -33,14 +33,7 @@ docker pull crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-tr
 #### 2. 运行容器
 
 ```bash
-docker run -d \
-  --name ai-travel-planner \
-  -p 3000:3000 \
-  -e DASHSCOPE_API_KEY=sk-your-dashscope-api-key \
-  -e NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co \
-  -e NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key \
-  -e NEXT_PUBLIC_AMAP_KEY=your-amap-key \
-  crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
+docker run -d   --name 1805ai-travel-planner   -p 3001:3000   crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner/ai-travel-planner:latest
 ```
 
 #### 3. 使用环境变量文件
@@ -48,12 +41,22 @@ docker run -d \
 创建 `docker.env` 文件：
 
 ```env
-DASHSCOPE_API_KEY=sk-your-dashscope-api-key
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-NEXT_PUBLIC_AMAP_KEY=your-amap-key
-PEXELS_API_KEY=your-pexels-api-key
-UNSPLASH_ACCESS_KEY=your-unsplash-access-key
+# 阿里云百炼 API Key
+DASHSCOPE_API_KEY=sk-8e24ebe054244474a8c85ed66936c406
+
+# Supabase 配置
+NEXT_PUBLIC_SUPABASE_URL=https://jwirtpmjiivnoupgtmue.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3aXJ0cG1qaWl2bm91cGd0bXVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0ODM3NDIsImV4cCI6MjA3ODA1OTc0Mn0.16IyQHNhaGaUn9w3-w6I9ZCN17cHTt3hwNCr5K2N0bI
+
+# 应用基础 URL（用于 Supabase 回调链接，避免在 Docker 中使用 0.0.0.0）
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+
+# 高德地图 API Key (可选)
+NEXT_PUBLIC_AMAP_KEY=695425cd4c58b3669ddbdacca32888cd
+
+# Unsplash API Key (用于图片搜索)
+UNSPLASH_ACCESS_KEY=NbubGfiKiW5BOnReYIKl6ceO8ooTreuwOaZFBUAT9rA
 ```
 
 然后运行：
@@ -99,23 +102,32 @@ pnpm install
 ```
 
 ### 2. 配置环境变量
+windows手动创建\
+mac: touch
 
 ```bash
-cp .env.example .env.local
+touch .env.local
 ```
 
 然后编辑 `.env.local` 填入你的配置：
 
 ```env
 # 阿里云百炼 API Key
-DASHSCOPE_API_KEY=sk-your-dashscope-api-key-here
+DASHSCOPE_API_KEY=sk-8e24ebe054244474a8c85ed66936c406
 
 # Supabase 配置
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+NEXT_PUBLIC_SUPABASE_URL=https://jwirtpmjiivnoupgtmue.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3aXJ0cG1qaWl2bm91cGd0bXVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0ODM3NDIsImV4cCI6MjA3ODA1OTc0Mn0.16IyQHNhaGaUn9w3-w6I9ZCN17cHTt3hwNCr5K2N0bI
+
+# 应用基础 URL（用于 Supabase 回调链接，避免在 Docker 中使用 0.0.0.0）
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
 
 # 高德地图 API Key (可选)
-NEXT_PUBLIC_AMAP_KEY=your-amap-key-here
+NEXT_PUBLIC_AMAP_KEY=695425cd4c58b3669ddbdacca32888cd
+
+# Unsplash API Key (用于图片搜索)
+UNSPLASH_ACCESS_KEY=NbubGfiKiW5BOnReYIKl6ceO8ooTreuwOaZFBUAT9rA
 ```
 
 **获取 API Keys 的方法**：
@@ -123,22 +135,8 @@ NEXT_PUBLIC_AMAP_KEY=your-amap-key-here
 - **Supabase**: https://supabase.com → 创建项目 → Settings → API
 - **高德地图**: https://console.amap.com/dev/key/app
 
-### 3. 设置 Supabase 数据库
 
-在 Supabase SQL Editor 中执行（详见 [SETUP.md](./SETUP.md)）：
-
-```sql
-CREATE TABLE itineraries (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  title TEXT,
-  payload JSONB
-);
--- 更多 SQL 见 SETUP.md
-```
-
-### 4. 启动开发服务器
+### 3. 启动开发服务器
 
 ```bash
 npm run dev
@@ -146,89 +144,7 @@ npm run dev
 
 访问 http://localhost:3000 🎉
 
-### 方式三：本地构建 Docker 镜像
 
-#### 1. 准备环境变量文件
-
-确保 `docker.env` 文件存在并包含所有必需的环境变量：
-
-```env
-DASHSCOPE_API_KEY=sk-your-dashscope-api-key
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-NEXT_PUBLIC_AMAP_KEY=your-amap-key
-UNSPLASH_ACCESS_KEY=your-unsplash-access-key
-```
-
-#### 2. 使用 PowerShell 脚本构建（推荐）
-
-```powershell
-# 使用默认标签
-.\build-docker.ps1
-
-# 或指定自定义标签
-.\build-docker.ps1 -Tag "ai-travel-planner:my-tag"
-```
-
-脚本会自动从 `docker.env` 文件读取环境变量，创建 `.env.local` 文件用于构建，构建完成后自动清理。
-
-**安全说明**：
-- ✅ 使用 `.env.local` 文件而不是 `ARG/ENV`，避免 Docker 安全警告
-- ✅ 只将 `NEXT_PUBLIC_*` 变量写入 `.env.local`（需要在构建时嵌入到客户端代码）
-- ✅ 服务器端密钥（`DASHSCOPE_API_KEY`、`UNSPLASH_ACCESS_KEY`）不在构建时使用，应在运行时通过 `--env-file` 传递
-
-#### 3. 手动构建（不使用脚本）
-
-如果需要手动构建，需要先创建 `.env.local` 文件：
-
-```powershell
-# 从 docker.env 提取 NEXT_PUBLIC_* 变量并创建 .env.local
-Get-Content docker.env | Where-Object { 
-    $_ -notmatch '^\s*#' -and $_ -match '^NEXT_PUBLIC_' 
-} | Out-File -FilePath .env.local -Encoding utf8
-
-# 构建镜像
-docker build -t ai-travel-planner:local .
-
-# 清理临时文件
-Remove-Item .env.local -Force
-```
-
-或者使用 Bash（Linux/Mac）：
-
-```bash
-# 从 docker.env 提取 NEXT_PUBLIC_* 变量并创建 .env.local
-grep '^NEXT_PUBLIC_' docker.env > .env.local
-
-# 构建镜像
-docker build -t ai-travel-planner:local .
-
-# 清理临时文件
-rm .env.local
-```
-
-#### 4. 运行构建的镜像
-
-**重要**：服务器端密钥（`DASHSCOPE_API_KEY`、`UNSPLASH_ACCESS_KEY`）在运行时通过环境变量传递，不会嵌入到镜像中，更安全。
-
-```bash
-docker run -d \
-  --name ai-travel-planner \
-  -p 3000:3000 \
-  --env-file docker.env \
-  ai-travel-planner:local
-```
-
-或者手动指定环境变量：
-
-```bash
-docker run -d \
-  --name ai-travel-planner \
-  -p 3000:3000 \
-  -e DASHSCOPE_API_KEY=sk-your-key \
-  -e UNSPLASH_ACCESS_KEY=your-unsplash-key \
-  ai-travel-planner:local
-```
 
 ## 📦 Docker 镜像信息
 
@@ -241,13 +157,11 @@ crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner
 ### 可用标签
 
 - `latest` - 最新版本（main 分支）
-- `main` - main 分支构建
-- `v1.0.0` - 版本标签（如果存在）
-- `main-<commit-sha>` - 特定提交构建
+
 
 ### 镜像大小
 
-约 200-300MB（基于 Node.js 20 Alpine）
+约174 MB（基于 Node.js 20 Alpine）
 
 ## 🔧 环境变量说明
 
@@ -257,45 +171,7 @@ crpi-qpqr9kpy8y14y90q.cn-hangzhou.personal.cr.aliyuncs.com/zjj-ai-travel-planner
 | `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Supabase 项目 URL | https://supabase.com |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Supabase 匿名 Key | https://supabase.com |
 | `NEXT_PUBLIC_AMAP_KEY` | ⭕ | 高德地图 API Key | https://console.amap.com/dev/key/app |
-| `PEXELS_API_KEY` | ⭕ | Pexels 图片 API Key | https://www.pexels.com/api/ |
 | `UNSPLASH_ACCESS_KEY` | ⭕ | Unsplash 图片 API Key | https://unsplash.com/developers |
-
-## 📖 详细文档
-
-完整的设置指南、常见问题和故障排查，请查看 **[SETUP.md](./SETUP.md)**
-
-## 🔄 CI/CD
-
-项目使用 GitHub Actions 自动构建和推送 Docker 镜像到阿里云容器镜像服务。
-
-### 触发条件
-
-- 推送到 `main` 或 `master` 分支
-- 创建版本标签（`v*`）
-- 手动触发（workflow_dispatch）
-
-### 配置 GitHub Secrets
-
-在 GitHub 仓库设置中添加以下 Secrets：
-
-- `ALIYUN_ACR_USERNAME` - 阿里云容器镜像服务用户名
-- `ALIYUN_ACR_PASSWORD` - 阿里云容器镜像服务密码
-
-### 配置步骤
-
-1. 登录阿里云控制台
-2. 进入容器镜像服务 ACR
-3. 创建命名空间（如果还没有）
-4. 获取访问凭证（用户名和密码）
-5. 在 GitHub 仓库 Settings → Secrets and variables → Actions 中添加上述两个 Secret
-6. 修改 `.github/workflows/docker-build.yml` 中的 `NAMESPACE` 为你的命名空间
-
-## 🚢 部署到 Vercel
-
-1. 将代码推送到 GitHub
-2. 在 Vercel 导入项目
-3. 添加环境变量
-4. 点击 Deploy
 
 ## 🛠️ 技术栈
 
@@ -337,12 +213,18 @@ ai-travel-planner-nextjs/
 
 ## 🐛 常见问题
 
+>  **Tips**: 收到supabase的邮箱链接后，需要注意，如果开头是0.0.0.0:3000，请手动替换为localhost，一般不会存在这个问题。
+
 ### Q: Docker 容器无法启动？
 
 A: 检查：
 1. 环境变量是否正确配置
 2. 端口 3000 是否被占用
 3. 查看容器日志：`docker logs ai-travel-planner`
+
+### Q: 本地项目运行环境？
+
+A: mac/windows
 
 ### Q: 百炼 API 调用失败？
 
