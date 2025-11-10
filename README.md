@@ -42,21 +42,21 @@ docker run -d   --name 1805ai-travel-planner   -p 3001:3000   crpi-qpqr9kpy8y14y
 
 ```env
 # 阿里云百炼 API Key
-DASHSCOPE_API_KEY=sk-8e24ebe054244474a8c85ed66936c406
+DASHSCOPE_API_KEY=your_key
 
 # Supabase 配置
 NEXT_PUBLIC_SUPABASE_URL=https://jwirtpmjiivnoupgtmue.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3aXJ0cG1qaWl2bm91cGd0bXVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0ODM3NDIsImV4cCI6MjA3ODA1OTc0Mn0.16IyQHNhaGaUn9w3-w6I9ZCN17cHTt3hwNCr5K2N0bI
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
 
 # 应用基础 URL（用于 Supabase 回调链接，避免在 Docker 中使用 0.0.0.0）
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 
 # 高德地图 API Key (可选)
-NEXT_PUBLIC_AMAP_KEY=695425cd4c58b3669ddbdacca32888cd
+NEXT_PUBLIC_AMAP_KEY=your_key
 
 # Unsplash API Key (用于图片搜索)
-UNSPLASH_ACCESS_KEY=NbubGfiKiW5BOnReYIKl6ceO8ooTreuwOaZFBUAT9rA
+UNSPLASH_ACCESS_KEY=your_key
 ```
 
 然后运行：
@@ -113,21 +113,21 @@ touch .env.local
 
 ```env
 # 阿里云百炼 API Key
-DASHSCOPE_API_KEY=sk-8e24ebe054244474a8c85ed66936c406
+DASHSCOPE_API_KEY=your_key
 
 # Supabase 配置
 NEXT_PUBLIC_SUPABASE_URL=https://jwirtpmjiivnoupgtmue.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3aXJ0cG1qaWl2bm91cGd0bXVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0ODM3NDIsImV4cCI6MjA3ODA1OTc0Mn0.16IyQHNhaGaUn9w3-w6I9ZCN17cHTt3hwNCr5K2N0bI
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
 
 # 应用基础 URL（用于 Supabase 回调链接，避免在 Docker 中使用 0.0.0.0）
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 
 # 高德地图 API Key (可选)
-NEXT_PUBLIC_AMAP_KEY=695425cd4c58b3669ddbdacca32888cd
+NEXT_PUBLIC_AMAP_KEY=your_key
 
 # Unsplash API Key (用于图片搜索)
-UNSPLASH_ACCESS_KEY=NbubGfiKiW5BOnReYIKl6ceO8ooTreuwOaZFBUAT9rA
+UNSPLASH_ACCESS_KEY=your_key
 ```
 
 **获取 API Keys 的方法**：
@@ -213,7 +213,7 @@ ai-travel-planner-nextjs/
 
 ## 🐛 常见问题
 
->  **Tips**: 收到supabase的邮箱链接后，需要注意，如果开头是0.0.0.0:3000，请手动替换为localhost，一般不会存在这个问题。
+>  **Tips**: 收到supabase的邮箱链接后，需要注意，如果开头是0.0.0.0:3000，请手动替换为localhost，一般不会存在这个问题
 
 ### Q: Docker 容器无法启动？
 
